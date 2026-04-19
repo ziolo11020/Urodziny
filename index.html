@@ -38,7 +38,7 @@
     }
 
     .card {
-      width: min(92vw, 520px);
+      width: min(92vw, 560px);
       background: rgba(255,255,255,0.08);
       border: 1px solid rgba(255,255,255,0.12);
       border-radius: 24px;
@@ -78,7 +78,6 @@
       box-shadow: 0 10px 25px rgba(255, 61, 104, 0.35);
     }
 
-    /* SLOT */
     .slot-machine {
       position: relative;
       width: min(92vw, 420px);
@@ -172,7 +171,6 @@
       to { opacity: 1; transform: scale(1.08); }
     }
 
-    /* ROULETTE */
     .bet-buttons {
       display: flex;
       gap: 12px;
@@ -246,7 +244,6 @@
       box-shadow: inset 0 2px 6px rgba(0,0,0,0.25);
     }
 
-    /* SCRATCH CARD */
     .scratch-box {
       width: min(92vw, 360px);
       height: 220px;
@@ -272,7 +269,7 @@
       padding: 16px;
     }
 
-    .jackpot {
+    .scratch-title {
       font-size: 34px;
       letter-spacing: 1px;
       text-shadow: 0 2px 0 rgba(255,255,255,0.5);
@@ -288,7 +285,6 @@
       cursor: pointer;
     }
 
-    /* PRIZES */
     .prize-list {
       text-align: left;
       margin: 18px auto 8px;
@@ -298,16 +294,23 @@
       line-height: 1.7;
     }
 
-    .voucher-image {
+    .gallery {
+      display: flex;
+      flex-direction: column;
+      gap: 16px;
+      align-items: center;
+      margin-top: 20px;
+    }
+
+    .reward-image {
       width: min(100%, 320px);
       border-radius: 16px;
-      margin-top: 20px;
       box-shadow: 0 12px 28px rgba(0,0,0,0.35);
       border: 3px solid rgba(255,255,255,0.7);
       background: #fff;
+      display: block;
     }
 
-    /* POPUP */
     .popup {
       position: fixed;
       inset: 0;
@@ -352,6 +355,7 @@
       margin-top: 16px;
       box-shadow: 0 10px 24px rgba(0,0,0,0.25);
       display: none;
+      background: #fff;
     }
 
     @keyframes popIn {
@@ -374,7 +378,6 @@
 </head>
 <body>
 
-  <!-- EKRAN 1 -->
   <section class="screen active" id="screen1">
     <div class="card">
       <h1>Cześć Michalinko! 🎉</h1>
@@ -384,7 +387,6 @@
     </div>
   </section>
 
-  <!-- GRA 1 -->
   <section class="screen" id="screen2">
     <div class="card" style="background: transparent; border: none; box-shadow: none; padding-top: 0;">
       <h2>Gra 1: Jednoręki bandyta</h2>
@@ -416,7 +418,6 @@
     </div>
   </section>
 
-  <!-- GRA 2 -->
   <section class="screen" id="screen3">
     <div class="card">
       <h2>Gra 2: Ruletka</h2>
@@ -436,7 +437,6 @@
     </div>
   </section>
 
-  <!-- GRA 3 -->
   <section class="screen" id="screen4">
     <div class="card">
       <h2>Gra 3: Zdrapka</h2>
@@ -444,7 +444,7 @@
 
       <div class="scratch-box" id="scratchBox">
         <div class="scratch-content">
-          <div class="jackpot">BON PODARUNKOWY</div>
+          <div class="scratch-title">BON PODARUNKOWY</div>
           <p>Specjalna nagroda dla Ciebie</p>
         </div>
         <canvas id="scratchCanvas"></canvas>
@@ -452,7 +452,6 @@
     </div>
   </section>
 
-  <!-- KONIEC -->
   <section class="screen" id="screen5">
     <div class="card">
       <h2>Twoje nagrody 🎁</h2>
@@ -463,18 +462,20 @@
         <div>3. Bon podarunkowy</div>
       </div>
 
-      <img src="bon.jpg" alt="Bon podarunkowy" class="voucher-image">
+      <div class="gallery">
+        <img src="masaz.jpg" alt="Masaż" class="reward-image">
+        <img src="bon.jpg" alt="Bon podarunkowy" class="reward-image">
+      </div>
 
       <p style="margin-top:18px; font-size:20px;"><strong>Wszystkiego najlepszego Michalinko! ❤️</strong></p>
     </div>
   </section>
 
-  <!-- POPUP -->
   <div class="popup" id="popup">
     <div class="popup-box">
       <h3 id="popupTitle">Brawo!</h3>
       <p id="popupText"></p>
-      <img id="popupImage" class="popup-image" src="bon.jpg" alt="Bon podarunkowy">
+      <img id="popupImage" class="popup-image" src="" alt="Nagroda">
       <button class="secondary-btn" id="popupBtn" onclick="closePopup()">OK</button>
     </div>
   </div>
@@ -482,7 +483,6 @@
   <script>
     let nextAfterPopup = null;
     let currentRotation = 0;
-    let popupShowImage = false;
 
     function goToScreen(number) {
       document.querySelectorAll('.screen').forEach(screen => {
@@ -495,17 +495,23 @@
       }
     }
 
-    function showPopup(title, text, buttonText = "Dalej", nextScreen = null, showImage = false) {
+    function showPopup(title, text, buttonText = "Dalej", nextScreen = null, imageSrc = null, imageAlt = "Nagroda") {
       document.getElementById('popupTitle').textContent = title;
       document.getElementById('popupText').textContent = text;
       document.getElementById('popupBtn').textContent = buttonText;
-      document.getElementById('popup').classList.add('show');
 
       const popupImage = document.getElementById('popupImage');
-      popupImage.style.display = showImage ? 'block' : 'none';
+      if (imageSrc) {
+        popupImage.src = imageSrc;
+        popupImage.alt = imageAlt;
+        popupImage.style.display = 'block';
+      } else {
+        popupImage.style.display = 'none';
+        popupImage.src = '';
+      }
 
+      document.getElementById('popup').classList.add('show');
       nextAfterPopup = nextScreen;
-      popupShowImage = showImage;
     }
 
     function closePopup() {
@@ -518,7 +524,6 @@
       }
     }
 
-    // GRA 1
     function playSlot() {
       const symbols = ["🍒", "🍋", "💎", "🪙", "🎁", "⭐"];
       const reels = [
@@ -533,6 +538,7 @@
           reel.textContent = symbols[Math.floor(Math.random() * symbols.length)];
         });
         spins++;
+
         if (spins > 10) {
           clearInterval(interval);
           reels[0].textContent = "💆";
@@ -544,14 +550,15 @@
               "Brawo!",
               "Wygrałaś masaż od męża!",
               "Graj dalej",
-              3
+              3,
+              "masaz.jpg",
+              "Masaż"
             );
           }, 300);
         }
       }, 120);
     }
 
-    // GRA 2
     function spinRoulette(choice) {
       const wheel = document.getElementById("wheel");
       const info = document.getElementById("rouletteInfo");
@@ -581,7 +588,6 @@
       }, 3200);
     }
 
-    // ZDRAPKA
     let scratchInitialized = false;
     let scratchDone = false;
     let canvas, ctx, isDrawing = false;
@@ -675,7 +681,8 @@
             "Wygrałaś bon podarunkowy! Zobacz swoje nagrody.",
             "Zobacz",
             5,
-            true
+            "bon.jpg",
+            "Bon podarunkowy"
           );
         }, 500);
       }
