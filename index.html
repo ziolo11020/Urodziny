@@ -7,6 +7,7 @@
   <style>
     * {
       box-sizing: border-box;
+      -webkit-tap-highlight-color: transparent;
     }
 
     body {
@@ -245,7 +246,7 @@
       box-shadow: inset 0 2px 6px rgba(0,0,0,0.25);
     }
 
-    /* SCRATCH */
+    /* SCRATCH CARD */
     .scratch-box {
       width: min(92vw, 360px);
       height: 220px;
@@ -272,31 +273,38 @@
     }
 
     .jackpot {
-      font-size: 46px;
-      letter-spacing: 2px;
+      font-size: 34px;
+      letter-spacing: 1px;
       text-shadow: 0 2px 0 rgba(255,255,255,0.5);
     }
 
-    .scratch-cover {
+    #scratchCanvas {
       position: absolute;
       inset: 0;
-      background:
-        linear-gradient(135deg, #cfcfcf, #9f9f9f);
       z-index: 2;
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      font-size: 28px;
-      font-weight: bold;
-      color: #444;
-      transition: opacity 0.5s ease;
+      width: 100%;
+      height: 100%;
+      touch-action: none;
       cursor: pointer;
-      user-select: none;
     }
 
-    .scratch-cover.scratched {
-      opacity: 0;
-      pointer-events: none;
+    /* PRIZES */
+    .prize-list {
+      text-align: left;
+      margin: 18px auto 8px;
+      width: fit-content;
+      max-width: 100%;
+      font-size: 19px;
+      line-height: 1.7;
+    }
+
+    .voucher-image {
+      width: min(100%, 320px);
+      border-radius: 16px;
+      margin-top: 20px;
+      box-shadow: 0 12px 28px rgba(0,0,0,0.35);
+      border: 3px solid rgba(255,255,255,0.7);
+      background: #fff;
     }
 
     /* POPUP */
@@ -316,7 +324,9 @@
     }
 
     .popup-box {
-      width: min(92vw, 420px);
+      width: min(92vw, 460px);
+      max-height: 90vh;
+      overflow-y: auto;
       background: #fff;
       color: #222;
       border-radius: 22px;
@@ -334,6 +344,14 @@
     .popup-box p {
       font-size: 19px;
       line-height: 1.45;
+    }
+
+    .popup-image {
+      width: min(100%, 320px);
+      border-radius: 14px;
+      margin-top: 16px;
+      box-shadow: 0 10px 24px rgba(0,0,0,0.25);
+      display: none;
     }
 
     @keyframes popIn {
@@ -422,25 +440,31 @@
   <section class="screen" id="screen4">
     <div class="card">
       <h2>Gra 3: Zdrapka</h2>
-      <p>Kliknij, aby odkryć swoją wygraną</p>
+      <p>Przesuń palcem po zdrapce</p>
 
-      <div class="scratch-box">
+      <div class="scratch-box" id="scratchBox">
         <div class="scratch-content">
-          <div class="jackpot">JACKPOT</div>
-          <p>Wielka wygrana!</p>
+          <div class="jackpot">BON PODARUNKOWY</div>
+          <p>Specjalna nagroda dla Ciebie</p>
         </div>
-        <div class="scratch-cover" id="scratchCover" onclick="scratchCard()">ZDRAP</div>
+        <canvas id="scratchCanvas"></canvas>
       </div>
     </div>
   </section>
 
-  <!-- KONIEC / NAGRODY -->
+  <!-- KONIEC -->
   <section class="screen" id="screen5">
     <div class="card">
       <h2>Twoje nagrody 🎁</h2>
-      <p>1. Masaż od męża</p>
-      <p>2. 5 złotych monet</p>
-      <p>3. Jackpot</p>
+
+      <div class="prize-list">
+        <div>1. Masaż od męża</div>
+        <div>2. Zastępstwo na gotowanie obiadu</div>
+        <div>3. Bon podarunkowy</div>
+      </div>
+
+      <img src="bon.jpg" alt="Bon podarunkowy" class="voucher-image">
+
       <p style="margin-top:18px; font-size:20px;"><strong>Wszystkiego najlepszego Michalinko! ❤️</strong></p>
     </div>
   </section>
@@ -450,6 +474,7 @@
     <div class="popup-box">
       <h3 id="popupTitle">Brawo!</h3>
       <p id="popupText"></p>
+      <img id="popupImage" class="popup-image" src="bon.jpg" alt="Bon podarunkowy">
       <button class="secondary-btn" id="popupBtn" onclick="closePopup()">OK</button>
     </div>
   </div>
@@ -457,24 +482,36 @@
   <script>
     let nextAfterPopup = null;
     let currentRotation = 0;
+    let popupShowImage = false;
 
     function goToScreen(number) {
       document.querySelectorAll('.screen').forEach(screen => {
         screen.classList.remove('active');
       });
       document.getElementById('screen' + number).classList.add('active');
+
+      if (number === 4) {
+        setTimeout(initScratchCard, 100);
+      }
     }
 
-    function showPopup(title, text, buttonText = "Dalej", nextScreen = null) {
+    function showPopup(title, text, buttonText = "Dalej", nextScreen = null, showImage = false) {
       document.getElementById('popupTitle').textContent = title;
       document.getElementById('popupText').textContent = text;
       document.getElementById('popupBtn').textContent = buttonText;
       document.getElementById('popup').classList.add('show');
+
+      const popupImage = document.getElementById('popupImage');
+      popupImage.style.display = showImage ? 'block' : 'none';
+
       nextAfterPopup = nextScreen;
+      popupShowImage = showImage;
     }
 
     function closePopup() {
       document.getElementById('popup').classList.remove('show');
+      document.getElementById('popupImage').style.display = 'none';
+
       if (nextAfterPopup !== null) {
         goToScreen(nextAfterPopup);
         nextAfterPopup = null;
@@ -537,30 +574,111 @@
       setTimeout(() => {
         showPopup(
           "Brawo!",
-          `Trafiłaś ${choice}! Zarobiłaś 5 złotych monet!`,
+          `Trafiłaś ${choice}! Wygrałaś zastępstwo na gotowanie obiadu!`,
           "Graj dalej",
           4
         );
       }, 3200);
     }
 
-    // GRA 3
-    let scratched = false;
+    // ZDRAPKA
+    let scratchInitialized = false;
+    let scratchDone = false;
+    let canvas, ctx, isDrawing = false;
 
-    function scratchCard() {
-      if (scratched) return;
-      scratched = true;
+    function initScratchCard() {
+      if (scratchInitialized) return;
 
-      document.getElementById("scratchCover").classList.add("scratched");
+      const scratchBox = document.getElementById("scratchBox");
+      canvas = document.getElementById("scratchCanvas");
+      ctx = canvas.getContext("2d", { willReadFrequently: true });
 
-      setTimeout(() => {
-        showPopup(
-          "Jackpot!",
-          "Zobacz swoje nagrody",
-          "Zobacz",
-          5
-        );
-      }, 500);
+      const rect = scratchBox.getBoundingClientRect();
+      canvas.width = rect.width;
+      canvas.height = rect.height;
+
+      ctx.fillStyle = "#b8b8b8";
+      ctx.fillRect(0, 0, canvas.width, canvas.height);
+
+      const gradient = ctx.createLinearGradient(0, 0, canvas.width, canvas.height);
+      gradient.addColorStop(0, "#d7d7d7");
+      gradient.addColorStop(0.5, "#9f9f9f");
+      gradient.addColorStop(1, "#cfcfcf");
+      ctx.fillStyle = gradient;
+      ctx.fillRect(0, 0, canvas.width, canvas.height);
+
+      ctx.fillStyle = "#444";
+      ctx.font = "bold 28px Arial";
+      ctx.textAlign = "center";
+      ctx.fillText("ZDRAP", canvas.width / 2, canvas.height / 2 + 10);
+
+      ctx.globalCompositeOperation = "destination-out";
+
+      canvas.addEventListener("pointerdown", startScratch);
+      canvas.addEventListener("pointermove", scratchMove);
+      canvas.addEventListener("pointerup", endScratch);
+      canvas.addEventListener("pointerleave", endScratch);
+
+      scratchInitialized = true;
+    }
+
+    function startScratch(e) {
+      if (scratchDone) return;
+      isDrawing = true;
+      scratchAtEvent(e);
+    }
+
+    function scratchMove(e) {
+      if (!isDrawing || scratchDone) return;
+      scratchAtEvent(e);
+    }
+
+    function endScratch() {
+      isDrawing = false;
+      if (!scratchDone) {
+        checkScratchProgress();
+      }
+    }
+
+    function scratchAtEvent(e) {
+      const rect = canvas.getBoundingClientRect();
+      const x = (e.clientX - rect.left) * (canvas.width / rect.width);
+      const y = (e.clientY - rect.top) * (canvas.height / rect.height);
+
+      ctx.beginPath();
+      ctx.arc(x, y, 22, 0, Math.PI * 2);
+      ctx.fill();
+
+      checkScratchProgress();
+    }
+
+    function checkScratchProgress() {
+      const imageData = ctx.getImageData(0, 0, canvas.width, canvas.height);
+      const pixels = imageData.data;
+      let transparentCount = 0;
+
+      for (let i = 3; i < pixels.length; i += 4) {
+        if (pixels[i] < 20) transparentCount++;
+      }
+
+      const totalPixels = canvas.width * canvas.height;
+      const scratchedPercent = transparentCount / totalPixels;
+
+      if (scratchedPercent > 0.35 && !scratchDone) {
+        scratchDone = true;
+        canvas.style.transition = "opacity 0.4s ease";
+        canvas.style.opacity = "0";
+
+        setTimeout(() => {
+          showPopup(
+            "Twoje nagrody",
+            "Wygrałaś bon podarunkowy! Zobacz swoje nagrody.",
+            "Zobacz",
+            5,
+            true
+          );
+        }, 500);
+      }
     }
   </script>
 </body>
