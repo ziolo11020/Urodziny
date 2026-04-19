@@ -1,174 +1,567 @@
 <!DOCTYPE html>
 <html lang="pl">
 <head>
-<meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Loteria Urodzinowa</title>
-<style>
-body {
-    font-family: Arial, sans-serif;
-    text-align: center;
-    background: linear-gradient(135deg, #ff9a9e, #fad0c4);
-    color: #333;
-    margin: 0;
-    overflow: hidden;
-}
-.screen {
-    display: none;
-    padding-top: 80px;
-}
-.active {
-    display: block;
-}
-button {
-    padding: 12px 25px;
-    font-size: 18px;
-    border: none;
-    border-radius: 10px;
-    background: #ff6b6b;
-    color: white;
-    cursor: pointer;
-    margin-top: 20px;
-}
-.slot {
-    font-size: 60px;
-    margin: 20px;
-}
-.reel {
-    display: inline-block;
-    width: 80px;
-}
-.wheel {
-    width: 200px;
-    height: 200px;
-    border-radius: 50%;
-    border: 10px solid #fff;
-    margin: auto;
-    position: relative;
-    transition: transform 2s ease-out;
-    background: conic-gradient(
-        gold 0deg 60deg,
-        red 60deg 120deg,
-        gold 120deg 180deg,
-        red 180deg 240deg,
-        gold 240deg 300deg,
-        red 300deg 360deg
-    );
-}
-.coin {
-    position: absolute;
-    width: 20px;
-    height: 20px;
-    background: gold;
-    border-radius: 50%;
-    top: 0;
-    left: 50%;
-    animation: fall 1s linear forwards;
-}
-@keyframes fall {
-    to {
-        transform: translateY(400px);
-        opacity: 0;
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Loteria urodzinowa</title>
+  <style>
+    * {
+      box-sizing: border-box;
     }
-}
-</style>
-</head>
 
+    body {
+      margin: 0;
+      font-family: Arial, sans-serif;
+      background: radial-gradient(circle at top, #3b1d63, #12061f 65%);
+      color: #fff;
+      text-align: center;
+      min-height: 100vh;
+      overflow-x: hidden;
+    }
+
+    .screen {
+      display: none;
+      min-height: 100vh;
+      padding: 24px 16px 40px;
+      align-items: center;
+      justify-content: center;
+      flex-direction: column;
+    }
+
+    .screen.active {
+      display: flex;
+    }
+
+    h1, h2, h3, p {
+      margin: 10px 0;
+    }
+
+    .card {
+      width: min(92vw, 520px);
+      background: rgba(255,255,255,0.08);
+      border: 1px solid rgba(255,255,255,0.12);
+      border-radius: 24px;
+      padding: 24px;
+      box-shadow: 0 18px 50px rgba(0,0,0,0.35);
+      backdrop-filter: blur(8px);
+    }
+
+    button {
+      border: none;
+      border-radius: 14px;
+      padding: 14px 24px;
+      font-size: 18px;
+      font-weight: bold;
+      cursor: pointer;
+      margin-top: 16px;
+      transition: transform 0.15s ease, opacity 0.15s ease;
+    }
+
+    button:hover {
+      transform: scale(1.03);
+    }
+
+    button:active {
+      transform: scale(0.98);
+    }
+
+    .primary-btn {
+      background: linear-gradient(180deg, #ffcc4d, #ff9f1c);
+      color: #2b1200;
+      box-shadow: 0 10px 25px rgba(255, 166, 0, 0.35);
+    }
+
+    .secondary-btn {
+      background: linear-gradient(180deg, #ff6b81, #ff3d68);
+      color: #fff;
+      box-shadow: 0 10px 25px rgba(255, 61, 104, 0.35);
+    }
+
+    /* SLOT */
+    .slot-machine {
+      position: relative;
+      width: min(92vw, 420px);
+      background: linear-gradient(180deg, #d31245, #8a0f31);
+      border: 8px solid #ffcc4d;
+      border-radius: 28px;
+      padding: 24px 20px 80px;
+      margin: 18px auto 0;
+      box-shadow:
+        inset 0 0 0 4px rgba(255,255,255,0.12),
+        0 18px 40px rgba(0,0,0,0.45);
+    }
+
+    .slot-top {
+      font-size: 28px;
+      font-weight: bold;
+      color: #ffe38a;
+      margin-bottom: 18px;
+      text-shadow: 0 0 10px rgba(255,215,0,0.45);
+    }
+
+    .reels-wrap {
+      background: #2d0c16;
+      border-radius: 20px;
+      padding: 16px;
+      border: 4px solid #ffdd7a;
+      display: flex;
+      justify-content: center;
+      gap: 12px;
+    }
+
+    .reel {
+      width: 88px;
+      height: 100px;
+      background: linear-gradient(180deg, #fff, #f1f1f1);
+      color: #111;
+      border-radius: 18px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 54px;
+      box-shadow: inset 0 2px 10px rgba(0,0,0,0.15);
+    }
+
+    .lever {
+      position: absolute;
+      right: -26px;
+      top: 90px;
+      width: 18px;
+      height: 130px;
+      background: linear-gradient(180deg, #c8c8c8, #7f7f7f);
+      border-radius: 10px;
+    }
+
+    .lever::before {
+      content: "";
+      position: absolute;
+      top: -18px;
+      left: 50%;
+      transform: translateX(-50%);
+      width: 38px;
+      height: 38px;
+      background: #ff3d68;
+      border-radius: 50%;
+      box-shadow: 0 0 12px rgba(255, 61, 104, 0.7);
+    }
+
+    .slot-lights {
+      display: flex;
+      justify-content: center;
+      gap: 8px;
+      margin-top: 16px;
+      flex-wrap: wrap;
+    }
+
+    .slot-light {
+      width: 14px;
+      height: 14px;
+      border-radius: 50%;
+      background: #ffd54a;
+      box-shadow: 0 0 10px #ffd54a;
+      animation: blink 0.8s infinite alternate;
+    }
+
+    .slot-light:nth-child(2n) {
+      animation-delay: 0.25s;
+    }
+
+    @keyframes blink {
+      from { opacity: 0.45; transform: scale(0.95); }
+      to { opacity: 1; transform: scale(1.08); }
+    }
+
+    /* ROULETTE */
+    .bet-buttons {
+      display: flex;
+      gap: 12px;
+      justify-content: center;
+      flex-wrap: wrap;
+      margin-top: 18px;
+    }
+
+    .bet-btn {
+      min-width: 130px;
+      color: #fff;
+    }
+
+    .bet-red {
+      background: linear-gradient(180deg, #ff4d4d, #b30000);
+    }
+
+    .bet-black {
+      background: linear-gradient(180deg, #3a3a3a, #000);
+    }
+
+    .roulette-wrap {
+      margin-top: 24px;
+      position: relative;
+      display: inline-block;
+    }
+
+    .pointer {
+      width: 0;
+      height: 0;
+      border-left: 18px solid transparent;
+      border-right: 18px solid transparent;
+      border-top: 34px solid #ffd54a;
+      margin: 0 auto -10px;
+      position: relative;
+      z-index: 2;
+      filter: drop-shadow(0 2px 6px rgba(0,0,0,0.45));
+    }
+
+    .wheel {
+      width: 280px;
+      height: 280px;
+      border-radius: 50%;
+      border: 10px solid #d4a017;
+      box-shadow: 0 14px 35px rgba(0,0,0,0.4);
+      transition: transform 3s cubic-bezier(.17,.67,.14,1);
+      background:
+        conic-gradient(
+          #c4001d 0deg 45deg,
+          #111 45deg 90deg,
+          #c4001d 90deg 135deg,
+          #111 135deg 180deg,
+          #c4001d 180deg 225deg,
+          #111 225deg 270deg,
+          #c4001d 270deg 315deg,
+          #111 315deg 360deg
+        );
+      position: relative;
+      overflow: hidden;
+    }
+
+    .wheel::after {
+      content: "";
+      position: absolute;
+      inset: 50%;
+      width: 54px;
+      height: 54px;
+      transform: translate(-50%, -50%);
+      border-radius: 50%;
+      background: #ffd54a;
+      box-shadow: inset 0 2px 6px rgba(0,0,0,0.25);
+    }
+
+    /* SCRATCH */
+    .scratch-box {
+      width: min(92vw, 360px);
+      height: 220px;
+      margin: 24px auto 0;
+      border-radius: 22px;
+      overflow: hidden;
+      position: relative;
+      background: linear-gradient(135deg, #ffdc73, #ffb300);
+      box-shadow: 0 18px 40px rgba(0,0,0,0.35);
+      border: 4px solid #fff1b8;
+    }
+
+    .scratch-content {
+      position: absolute;
+      inset: 0;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      flex-direction: column;
+      color: #6a0023;
+      font-weight: bold;
+      z-index: 1;
+      padding: 16px;
+    }
+
+    .jackpot {
+      font-size: 46px;
+      letter-spacing: 2px;
+      text-shadow: 0 2px 0 rgba(255,255,255,0.5);
+    }
+
+    .scratch-cover {
+      position: absolute;
+      inset: 0;
+      background:
+        linear-gradient(135deg, #cfcfcf, #9f9f9f);
+      z-index: 2;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 28px;
+      font-weight: bold;
+      color: #444;
+      transition: opacity 0.5s ease;
+      cursor: pointer;
+      user-select: none;
+    }
+
+    .scratch-cover.scratched {
+      opacity: 0;
+      pointer-events: none;
+    }
+
+    /* POPUP */
+    .popup {
+      position: fixed;
+      inset: 0;
+      background: rgba(0,0,0,0.6);
+      display: none;
+      align-items: center;
+      justify-content: center;
+      padding: 20px;
+      z-index: 999;
+    }
+
+    .popup.show {
+      display: flex;
+    }
+
+    .popup-box {
+      width: min(92vw, 420px);
+      background: #fff;
+      color: #222;
+      border-radius: 22px;
+      padding: 26px 20px;
+      box-shadow: 0 18px 45px rgba(0,0,0,0.4);
+      text-align: center;
+      animation: popIn 0.22s ease;
+    }
+
+    .popup-box h3 {
+      margin-top: 0;
+      font-size: 28px;
+    }
+
+    .popup-box p {
+      font-size: 19px;
+      line-height: 1.45;
+    }
+
+    @keyframes popIn {
+      from {
+        transform: scale(0.9);
+        opacity: 0;
+      }
+      to {
+        transform: scale(1);
+        opacity: 1;
+      }
+    }
+
+    .small-note {
+      font-size: 14px;
+      opacity: 0.85;
+      margin-top: 8px;
+    }
+  </style>
+</head>
 <body>
 
-<!-- SCREEN 1 -->
-<div class="screen active" id="screen1">
-    <h1>Cześć Michalinko! 🎉</h1>
-    <h2>Oto twoja loteria urodzinowa</h2>
-    <button onclick="next(2)">Start</button>
-</div>
-
-<!-- SCREEN 2 SLOT -->
-<div class="screen" id="screen2">
-    <h2>🎰 Jednoręki bandyta</h2>
-    <div class="slot">
-        <span class="reel" id="r1">🍒</span>
-        <span class="reel" id="r2">🍋</span>
-        <span class="reel" id="r3">🍉</span>
+  <!-- EKRAN 1 -->
+  <section class="screen active" id="screen1">
+    <div class="card">
+      <h1>Cześć Michalinko! 🎉</h1>
+      <h2>Oto twoja loteria urodzinowa</h2>
+      <p>Dziś wszystko przynosi wygraną ✨</p>
+      <button class="primary-btn" onclick="goToScreen(2)">Start</button>
     </div>
-    <button onclick="spin()">Pociągnij wajchę</button>
-    <h3 id="slotResult"></h3>
-    <button id="slotNext" style="display:none" onclick="next(3)">Graj dalej</button>
-</div>
+  </section>
 
-<!-- SCREEN 3 RULETKA -->
-<div class="screen" id="screen3">
-    <h2>🎡 Ruletka</h2>
-    <div class="wheel" id="wheel"></div>
-    <button onclick="spinWheel()">Zakreć</button>
-    <h3 id="rouletteResult"></h3>
-    <button id="rouletteNext" style="display:none" onclick="next(4)">Graj dalej</button>
-</div>
+  <!-- GRA 1 -->
+  <section class="screen" id="screen2">
+    <div class="card" style="background: transparent; border: none; box-shadow: none; padding-top: 0;">
+      <h2>Gra 1: Jednoręki bandyta</h2>
 
-<!-- SCREEN 4 COIN PUSHER -->
-<div class="screen" id="screen4">
-    <h2>🪙 Popychacz monet</h2>
-    <button onclick="dropCoins()">Wrzuć monetę</button>
-    <h3 id="coinResult"></h3>
-</div>
+      <div class="slot-machine">
+        <div class="slot-top">LUCKY BIRTHDAY</div>
 
-<script>
-function next(n) {
-    document.querySelectorAll('.screen').forEach(s => s.classList.remove('active'));
-    document.getElementById('screen' + n).classList.add('active');
-}
+        <div class="reels-wrap">
+          <div class="reel" id="reel1">🎁</div>
+          <div class="reel" id="reel2">💎</div>
+          <div class="reel" id="reel3">🪙</div>
+        </div>
 
-// SLOT MACHINE
-function spin() {
-    let emojis = ["🍒", "🍋", "🍉", "⭐"];
-    let reels = ["r1", "r2", "r3"];
+        <div class="slot-lights">
+          <div class="slot-light"></div>
+          <div class="slot-light"></div>
+          <div class="slot-light"></div>
+          <div class="slot-light"></div>
+          <div class="slot-light"></div>
+          <div class="slot-light"></div>
+          <div class="slot-light"></div>
+          <div class="slot-light"></div>
+        </div>
 
-    reels.forEach((id, i) => {
-        setTimeout(() => {
-            document.getElementById(id).innerText = emojis[Math.floor(Math.random()*emojis.length)];
-        }, i * 200);
-    });
+        <div class="lever"></div>
+      </div>
 
-    setTimeout(() => {
-        document.getElementById("r1").innerText = "💎";
-        document.getElementById("r2").innerText = "💎";
-        document.getElementById("r3").innerText = "💎";
+      <button class="primary-btn" onclick="playSlot()">Zagraj</button>
+    </div>
+  </section>
 
-        document.getElementById("slotResult").innerText =
-            "🎉 Brawo! Wygrałaś masaż od męża!";
-        document.getElementById("slotNext").style.display = "inline-block";
-    }, 800);
-}
+  <!-- GRA 2 -->
+  <section class="screen" id="screen3">
+    <div class="card">
+      <h2>Gra 2: Ruletka</h2>
+      <p>Wybierz swój zakład:</p>
 
-// ROULETTE
-function spinWheel() {
-    let wheel = document.getElementById("wheel");
-    let deg = 1440 + Math.random() * 360;
-    wheel.style.transform = "rotate(" + deg + "deg)";
+      <div class="bet-buttons">
+        <button class="bet-btn bet-red" onclick="spinRoulette('czerwone')">Czerwone</button>
+        <button class="bet-btn bet-black" onclick="spinRoulette('czarne')">Czarne</button>
+      </div>
 
-    setTimeout(() => {
-        document.getElementById("rouletteResult").innerText =
-            "🎉 Brawo! Zarobiłaś 5 złotych monet!";
-        document.getElementById("rouletteNext").style.display = "inline-block";
-    }, 2000);
-}
+      <div class="roulette-wrap">
+        <div class="pointer"></div>
+        <div class="wheel" id="wheel"></div>
+      </div>
 
-// COIN PUSHER
-function dropCoins() {
-    for (let i = 0; i < 30; i++) {
-        let coin = document.createElement("div");
-        coin.classList.add("coin");
-        coin.style.left = Math.random() * window.innerWidth + "px";
-        coin.style.animationDelay = Math.random() + "s";
-        document.body.appendChild(coin);
+      <p class="small-note" id="rouletteInfo">Masz szczęście po swojej stronie.</p>
+    </div>
+  </section>
 
-        setTimeout(() => coin.remove(), 2000);
+  <!-- GRA 3 -->
+  <section class="screen" id="screen4">
+    <div class="card">
+      <h2>Gra 3: Zdrapka</h2>
+      <p>Kliknij, aby odkryć swoją wygraną</p>
+
+      <div class="scratch-box">
+        <div class="scratch-content">
+          <div class="jackpot">JACKPOT</div>
+          <p>Wielka wygrana!</p>
+        </div>
+        <div class="scratch-cover" id="scratchCover" onclick="scratchCard()">ZDRAP</div>
+      </div>
+    </div>
+  </section>
+
+  <!-- KONIEC / NAGRODY -->
+  <section class="screen" id="screen5">
+    <div class="card">
+      <h2>Twoje nagrody 🎁</h2>
+      <p>1. Masaż od męża</p>
+      <p>2. 5 złotych monet</p>
+      <p>3. Jackpot</p>
+      <p style="margin-top:18px; font-size:20px;"><strong>Wszystkiego najlepszego Michalinko! ❤️</strong></p>
+    </div>
+  </section>
+
+  <!-- POPUP -->
+  <div class="popup" id="popup">
+    <div class="popup-box">
+      <h3 id="popupTitle">Brawo!</h3>
+      <p id="popupText"></p>
+      <button class="secondary-btn" id="popupBtn" onclick="closePopup()">OK</button>
+    </div>
+  </div>
+
+  <script>
+    let nextAfterPopup = null;
+    let currentRotation = 0;
+
+    function goToScreen(number) {
+      document.querySelectorAll('.screen').forEach(screen => {
+        screen.classList.remove('active');
+      });
+      document.getElementById('screen' + number).classList.add('active');
     }
 
-    document.getElementById("coinResult").innerText =
-        "💰 Jackpot! Wygrałaś masę monet!";
-}
-</script>
+    function showPopup(title, text, buttonText = "Dalej", nextScreen = null) {
+      document.getElementById('popupTitle').textContent = title;
+      document.getElementById('popupText').textContent = text;
+      document.getElementById('popupBtn').textContent = buttonText;
+      document.getElementById('popup').classList.add('show');
+      nextAfterPopup = nextScreen;
+    }
 
+    function closePopup() {
+      document.getElementById('popup').classList.remove('show');
+      if (nextAfterPopup !== null) {
+        goToScreen(nextAfterPopup);
+        nextAfterPopup = null;
+      }
+    }
+
+    // GRA 1
+    function playSlot() {
+      const symbols = ["🍒", "🍋", "💎", "🪙", "🎁", "⭐"];
+      const reels = [
+        document.getElementById("reel1"),
+        document.getElementById("reel2"),
+        document.getElementById("reel3")
+      ];
+
+      let spins = 0;
+      const interval = setInterval(() => {
+        reels.forEach(reel => {
+          reel.textContent = symbols[Math.floor(Math.random() * symbols.length)];
+        });
+        spins++;
+        if (spins > 10) {
+          clearInterval(interval);
+          reels[0].textContent = "💆";
+          reels[1].textContent = "💆";
+          reels[2].textContent = "💆";
+
+          setTimeout(() => {
+            showPopup(
+              "Brawo!",
+              "Wygrałaś masaż od męża!",
+              "Graj dalej",
+              3
+            );
+          }, 300);
+        }
+      }, 120);
+    }
+
+    // GRA 2
+    function spinRoulette(choice) {
+      const wheel = document.getElementById("wheel");
+      const info = document.getElementById("rouletteInfo");
+
+      let targetSegment;
+      if (choice === "czerwone") {
+        targetSegment = 0;
+        info.textContent = "Postawiono na: czerwone";
+      } else {
+        targetSegment = 1;
+        info.textContent = "Postawiono na: czarne";
+      }
+
+      const segmentAngle = 45;
+      const targetAngle = targetSegment * segmentAngle + 22;
+      currentRotation += 1800 + (360 - targetAngle);
+
+      wheel.style.transform = `rotate(${currentRotation}deg)`;
+
+      setTimeout(() => {
+        showPopup(
+          "Brawo!",
+          `Trafiłaś ${choice}! Zarobiłaś 5 złotych monet!`,
+          "Graj dalej",
+          4
+        );
+      }, 3200);
+    }
+
+    // GRA 3
+    let scratched = false;
+
+    function scratchCard() {
+      if (scratched) return;
+      scratched = true;
+
+      document.getElementById("scratchCover").classList.add("scratched");
+
+      setTimeout(() => {
+        showPopup(
+          "Jackpot!",
+          "Zobacz swoje nagrody",
+          "Zobacz",
+          5
+        );
+      }, 500);
+    }
+  </script>
 </body>
 </html>
