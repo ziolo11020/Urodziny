@@ -1,0 +1,174 @@
+<!DOCTYPE html>
+<html lang="pl">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Loteria Urodzinowa</title>
+<style>
+body {
+    font-family: Arial, sans-serif;
+    text-align: center;
+    background: linear-gradient(135deg, #ff9a9e, #fad0c4);
+    color: #333;
+    margin: 0;
+    overflow: hidden;
+}
+.screen {
+    display: none;
+    padding-top: 80px;
+}
+.active {
+    display: block;
+}
+button {
+    padding: 12px 25px;
+    font-size: 18px;
+    border: none;
+    border-radius: 10px;
+    background: #ff6b6b;
+    color: white;
+    cursor: pointer;
+    margin-top: 20px;
+}
+.slot {
+    font-size: 60px;
+    margin: 20px;
+}
+.reel {
+    display: inline-block;
+    width: 80px;
+}
+.wheel {
+    width: 200px;
+    height: 200px;
+    border-radius: 50%;
+    border: 10px solid #fff;
+    margin: auto;
+    position: relative;
+    transition: transform 2s ease-out;
+    background: conic-gradient(
+        gold 0deg 60deg,
+        red 60deg 120deg,
+        gold 120deg 180deg,
+        red 180deg 240deg,
+        gold 240deg 300deg,
+        red 300deg 360deg
+    );
+}
+.coin {
+    position: absolute;
+    width: 20px;
+    height: 20px;
+    background: gold;
+    border-radius: 50%;
+    top: 0;
+    left: 50%;
+    animation: fall 1s linear forwards;
+}
+@keyframes fall {
+    to {
+        transform: translateY(400px);
+        opacity: 0;
+    }
+}
+</style>
+</head>
+
+<body>
+
+<!-- SCREEN 1 -->
+<div class="screen active" id="screen1">
+    <h1>Cześć Michalinko! 🎉</h1>
+    <h2>Oto twoja loteria urodzinowa</h2>
+    <button onclick="next(2)">Start</button>
+</div>
+
+<!-- SCREEN 2 SLOT -->
+<div class="screen" id="screen2">
+    <h2>🎰 Jednoręki bandyta</h2>
+    <div class="slot">
+        <span class="reel" id="r1">🍒</span>
+        <span class="reel" id="r2">🍋</span>
+        <span class="reel" id="r3">🍉</span>
+    </div>
+    <button onclick="spin()">Pociągnij wajchę</button>
+    <h3 id="slotResult"></h3>
+    <button id="slotNext" style="display:none" onclick="next(3)">Graj dalej</button>
+</div>
+
+<!-- SCREEN 3 RULETKA -->
+<div class="screen" id="screen3">
+    <h2>🎡 Ruletka</h2>
+    <div class="wheel" id="wheel"></div>
+    <button onclick="spinWheel()">Zakreć</button>
+    <h3 id="rouletteResult"></h3>
+    <button id="rouletteNext" style="display:none" onclick="next(4)">Graj dalej</button>
+</div>
+
+<!-- SCREEN 4 COIN PUSHER -->
+<div class="screen" id="screen4">
+    <h2>🪙 Popychacz monet</h2>
+    <button onclick="dropCoins()">Wrzuć monetę</button>
+    <h3 id="coinResult"></h3>
+</div>
+
+<script>
+function next(n) {
+    document.querySelectorAll('.screen').forEach(s => s.classList.remove('active'));
+    document.getElementById('screen' + n).classList.add('active');
+}
+
+// SLOT MACHINE
+function spin() {
+    let emojis = ["🍒", "🍋", "🍉", "⭐"];
+    let reels = ["r1", "r2", "r3"];
+
+    reels.forEach((id, i) => {
+        setTimeout(() => {
+            document.getElementById(id).innerText = emojis[Math.floor(Math.random()*emojis.length)];
+        }, i * 200);
+    });
+
+    setTimeout(() => {
+        document.getElementById("r1").innerText = "💎";
+        document.getElementById("r2").innerText = "💎";
+        document.getElementById("r3").innerText = "💎";
+
+        document.getElementById("slotResult").innerText =
+            "🎉 Brawo! Wygrałaś masaż od męża!";
+        document.getElementById("slotNext").style.display = "inline-block";
+    }, 800);
+}
+
+// ROULETTE
+function spinWheel() {
+    let wheel = document.getElementById("wheel");
+    let deg = 1440 + Math.random() * 360;
+    wheel.style.transform = "rotate(" + deg + "deg)";
+
+    setTimeout(() => {
+        document.getElementById("rouletteResult").innerText =
+            "🎉 Brawo! Zarobiłaś 5 złotych monet!";
+        document.getElementById("rouletteNext").style.display = "inline-block";
+    }, 2000);
+}
+
+// COIN PUSHER
+function dropCoins() {
+    for (let i = 0; i < 30; i++) {
+        let coin = document.createElement("div");
+        coin.classList.add("coin");
+        coin.style.left = Math.random() * window.innerWidth + "px";
+        coin.style.animationDelay = Math.random() + "s";
+        document.body.appendChild(coin);
+
+        setTimeout(() => coin.remove(), 2000);
+    }
+
+    document.getElementById("coinResult").innerText =
+        "💰 Jackpot! Wygrałaś masę monet!";
+}
+</script>
+
+</body>
+</html>
